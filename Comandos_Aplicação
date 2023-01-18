@@ -1,0 +1,612 @@
+Começando o Projeto API Vendas:
+
+- Instalando o Yarn
+  npm i yarn
+
+- Instalando as Bibliotecas Necessárias
+  yarn add typescript ts-node-dev @types/node tsconfig-paths -D
+
+- Iniciando o Projeto com o Yarn
+  yarn init -y
+
+- Criar o arquivo “tsconfig.json” que conterá as configurações do Typescript
+  yarn tsc --init --rootDir src --outDir build –esModuleInterop --resolveJsonModule --lib es6 --module commonjs --allowJs true --noImplicitAny true
+
+- Pra rodar o projeto, tem que converter de Javascript para TypeScript
+  yarn tsc
+
+- Depois Rodar o arquivo server.js que fica dentro da pasta build
+  node build/server.js
+
+- Usaremos a biblioteca ts-node-dev para execução da aplicação em Desenvolvimento.
+- Incluir o script pra rodar o ts-node-dev no arquivo package.json
+
+“scripts”: {
+“dev”: “ts-node-dev --inspect --transpile-only --ignore-watch node_modules src/server.ts”
+}
+
+- Como o parametro “scripts” foi criado e configurado com o dev, é só rodar
+  yarn dev
+
+- Instalar a extensão editorConfig
+  baixa e instala em extensões, depois clica com o botão direito e escolhe a opção “Generate .editorconfig”, será criado o arquivo .editorconfig,
+  Em indent_size muda de 4 pra 2
+  Em trim_trailing_whitespace = true
+  Em insert_final_newline = true
+
+- Configurar o EsLint no Visual Studio Code e nos Projetos Node.
+
+yarn add -D eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
+
+- Na Raiz de Nosso Projeto, crie um arquivo chamado “.eslintrc” com uma configuração inicial do ESLint, com as informações abaixo.
+
+{
+“root”: true,
+“parser”: “@typescript-eslint/parser”,
+“plugins”: [
+@typescript-eslint
+],
+“extends”: [
+“eslint: recommended”,
+“plugin:@typescript-eslint/eslint-recommended”,
+“plugin:@typescript-eslint/eslint/recommended”
+]
+}
+
+- Na Raiz de Nosso Projeto, Criar um Arquivo chamdo “.eslintignore” com uma configuração inicial do ESLint, com as informações abaixo.
+
+node_modules
+dist
+build
+/\*.js
+
+- Adicionar um script no arquivo “package.json” para executar o lint e outro script pra tentar corrigir os erros encontrados pelo eslint
+
+“scripts”: {
+“lint”: “eslint . --ext .ts”,
+“lint”: “eslint . --ext .ts --fix”
+}
+
+- Fazer a Instalação do Prettier
+  yarn add prettier -D
+
+- Criar o Arquivo “.prettierrc” com uma configuração básica do Prettier.
+  {
+  “semi”: true,
+  “trailingComma”: “all”,
+  “singleQuote”: true,
+  “printWidth”: 80,
+  “arrowParens”: “avoid”
+  }
+
+- Configurando o Prettier para trabalhar com o ESLint
+  yarn add esçint-config-prettier eslint-plugin-prettier -D
+
+- Como o arquivo ".eslintrc" tem que ficar
+
+{
+"root": true,
+"parser": "@typescript-eslint/parser",
+"plugins": [
+"@typescript-eslint",
+"prettier"
+],
+"extends": [
+"eslint:recommended",
+"plugin:@typescript-eslint/eslint-recommended",
+"plugin:@typescript-eslint/recommended",
+"prettier/@typescript-eslint",
+"plugin:prettier/recommended"
+],
+"rules": {
+"no-console": "warn",
+"prettier/prettier": "error"
+}
+}
+
+Estrutura do Projeto
+
+- Estruturas de Pastas:
+
+* config:
+  Configurações de bibliotecas externas, como por exemplo, autenticação, upload, email, etc.
+
+* modules:
+  Abrangem as áreas de conhecimento da aplicação, diretamente relacionados com as regras de negócios da aplicação. A Princípio criaremos
+  os seguintes módulos na aplicação: customers, products, orders e users.
+
+* shared:
+  Módulos de uso geral compartilhado com mais de um módulo da aplicação, como por exemplo, o server.ts, o arquivo preincipal de rotas,
+  conexão com o banco de dados
+
+* services:
+  Estarão dentro de cada módulo da aplicação e serão responsáveis por todas as regras que a aplicação precisa atender, como por exemplo:
+
+- A senha deve ser armazenada com criptografia
+- Não pode haver mais de um produto com o mesmo nome
+- Não pode haver um mesmo email sendo usado por mais de um usuário
+- E muitas outras
+
+* Vamos Criar as pastas dentro da pasta src
+
+- mkdir -p src/config
+- mkdir -p src/modules
+- mkdir -p src/shared/http
+- mkdir -p src/shared/http
+
+* Mover o arquivo "server.ts" da pasta src/ para src/shared/http
+
+* Alterar o caminho do comando "dev" no parametro "scripts" no arquivo package.json
+  De "dev": "ts-node-dev --inspect --transpile-only --ignore-watch node_modules src/server.ts"
+  Para "dev": "ts-node-dev --inspect --transpile-only --ignore-watch node_modules src/shared/http/server.ts"
+
+* Configurando as Importações
+  Iniciamos configurando o objeto paths do tsconfig.json, que permite criar uma base para cada path a ser buscado no projeto, funcionando
+  de forma similar a um atalho.
+
+"paths": {
+"@config/_": ["src/config/_"],
+"@modules/_": ["src/modules/_"],
+"@shared/_": ["src/shared/_"]
+}
+
+Obs: Agora, para importar qualquer arquivo no projeto, inicie o caminho com um dos paths configurados, usando CTRL + SPACE para usar o
+autocomplete.
+
+- Tem que descomentar o parametro "baseUrl", dentro do arquivo tsconfig.json, se não apresenta erro nos paths
+
+- Instalar as bibliotecas princinpais:
+  yarn add express cors express-async-errors
+  yarn add -D @types/express @types/cors
+
+- Fazer as configurações básicas no arquivo server.ts
+  import express from 'express'
+  import cors from 'cors'
+
+- Instalar o TypeORM, o reflect-metadata(exigido pelo TypeORM) e o pg(Postgresql)
+  yarn add typeorm reflect-metadata pg
+
+  - Docker
+    A principal utilidade do Docker é a criação de ambientes isolados através dos containers. Ao utilizar container você garante que não haverá conflito entre ferramentas no seu PC ou em Servidores.
+
+    CONTAINER é um processo em execução, com alguns recursos adicionais encapsulados para mantê-lo isolado do host e de outros containers.
+    Um dos aspectos mais importantes desse isolamento é que cada container interage com seu próprio sistema de arquivos privado; esse
+    sistema de arquivos é fornecido por uma imagem do Docker.
+
+    Uma imagem inclui tudo que é necessário para executar um aplicativo - o código ou binário, dependências e quaisquer outros objetos necessários.
+
+    O Docker-Hub é o repositório oficial para armazenamento das imagens.
+
+    COMANDOS DO DOCKER:
+
+    - docker -h
+      Listar as opções do comando docker
+
+    - docker run
+      Criar e Executar um Container
+
+    - docker start <container-name>
+      Executar um Container
+
+    - docker stop <container-name>
+      Encerrar a execução de um container
+
+    - docker ps
+      Listar todos os Containers em execução
+
+    - docker ps -a
+      Listar todos os Containers
+
+    - docker rm <container-name>
+      Excluir um Container
+
+    - docker images
+      Listar Todas as Imagens no PC
+
+    - docker rmi <image-name>
+      Excluir uma imagem no PC
+
+    - docker logs <container-name>
+      Exibir os Logs da Execução do Container
+
+    - docker inspect <container-name>
+      Exibir todas as informações do container
+
+    - docker info
+      Exibir as informações do Docker
+
+Como no curso utilizou a biblioteca TypeORM versão 0.2.29, foi necessário alterar a versão de 0.3.X para 0.2.29
+
+TypeORM:
+
+- É a biblioteca para conexão com o Banco de Dados.
+
+Parâmetros que serão configurados do TypeORM
+
+- type:
+  Informar qual é o banco de dados.
+
+- name:
+  Definir um nome pra conexão.
+
+- entities:
+  Onde vão estar as entidades do projeto.
+
+- migrations:
+  Onde vão estar os arquivos de migração. Ex: Onde vão criar as Tabelas.
+
+Criação do Container no Docker:
+
+docker run --name postgres -e POSTGRES_PASSWORD==docker -p 5432:5432 -d postgres
+
+Explicando o Comando:
+
+docker run:
+Criando a imagem
+
+--name postgres:
+Nome da imagem será postgres.
+
+-e POSTGRES_PASSWORD=docker:
+Criando uma variavel de ambiente em PATH, com valor docker -> que pe a mesma senha do postgres.
+
+-p 5432:5432
+Informando as portas, o primeiro numero "5432"(da esquerda) é a porta que o sistema operacional vai usar, pode ser qualquer porta, o numero da direita é a porta que o Docker vai usar, esse não pode ser mudado.
+
+-d:
+Informando que esse comando irá funcionar em background, ou seja, depois de executado ele não vai travar o terminal, você pode continuar utilizando terminal que ele estará executando.
+
+postgres:
+Como o comando será executado pela primeira vez, tem que informar o nome da imagem, pois ainda não existe essa imagem na maquina
+
+- Na hora da execução deu erro porque será necessário instalar a biblioteca e ajustar o parametro dev em scripts no arquivo "package.json"
+  "dev": "ts-node-dev -r tsconfig-paths/register --inspect --transpile-only --ignore-watch node_modules src/shared/http/server.ts"
+
+Comando para baixar a biblioteca:
+yarn add -D tsconfig-paths
+
+Configuração das Migrations:
+
+- Migração da Tabela Products(Produtos)
+  yarn typeorm migration:create -n CreateProducts
+
+- Para Rodar o Migration, para criação da tabela utiliza o seguinte comando
+  yarn timeorm migration:run
+
+- Precisa Informar que vai utilizar biblioteca uuid
+  Dentro do DBeaver ou pgadmin, clica com o botão direito do mouse no nome do banco de dados e escolhe a opção Criar, Depois em Extensão, Depois vai na lista que aparece e clica na opção uuid-ossp e clica em OK
+
+Criando a entidade Product:
+
+- Quando informou os nomes das colunas no arquivo de entidades, todos ficaram sublinhados em vermelho com erro, será necessário ajustar, informando mais um parametro no arquivo tsconfif.json.
+  Se os parametros já existirem tem que descomentar, se não tem que colocar os parametros com valor true, menos o parametro "strictPropertyInitialization" que tem que colocar o valor false, que são:
+  "experimentalDecorators": true
+  "emitDecoratorMetadata": true
+  "strictPropertyInitialization": false
+
+Conceito de Repósitorios no TypeORM:
+
+- Permitem fazer as operações em uma Entidade.
+
+- Exemplos: Criar, Atualizar, Remover...
+
+- Primeiro tem que importar o getRepository do tipeorm:
+  import { getRepository } from 'typeorm'
+
+- Depois importa nossa Entidade:
+  import { Product } from './modules/products/typeorm/entities'
+
+- Criar um objeto productRepository com base no Product, ela vai ser passada com parametro na função getRepository:
+  const productRepository = getRepository(Product)
+
+- Pra utlizar nos metodos pré-definidos
+
+Criar Repositório de Produtos
+
+- Primeiro Criar uma Pasta de Repositórios chamada repositories em?
+  mkdir -p src/modules/products/typeorm/repositories
+
+- Criar um arquivo de Repositório chamado ProductsRepository:
+
+Serviço Para Craição de Produto:
+
+- Primeiro criar uma camada de serviços, criando uma pasta de Serviços chamada services em:
+  src/modules/products
+
+- Criar um arquivo de Serviço chamado CreateProductService.ts:
+  Nesse arquivo precisa inicialmente criar uma classe chamada CreateProductService, todos serviços devem ter apenas uma única responsabilidade, nesse caso um único metódo.
+
+  class CreateProductService{
+  public async execute(data: ) {
+
+  }
+  }
+
+Criar o Controller de Produtos
+
+- Primeiro criar uma pasta para os controllers de produtos, chamada controllers
+
+- Depois criar um arquivo de controller, chamado ProductsController.ts
+
+- E Dentro dele que estarão todas as rotas
+
+- É Necessário informar as entidades no arquivo ormconfig.ts, com o seguinte parametro
+  Em baixo do parametro database, coloca o seguinte parametro:
+  "entities": ["./src/modules/**/typeorm/entities/*.ts"]
+
+Precisa Criar as validações das rotas, como por enquanto só temos produtos, vamos começar por ela:
+
+- Dentro do arquivo products.routes.ts, em src/modules/products/routes
+
+- Antes precisamos instalar a biblioteca celebrate:
+  yarn add celebrate
+
+- Também é necessário instalar a biblioteca joi, mas como Desenvolvedor
+  yarn add -D @types/joi
+
+---
+
+---
+
+- MÓDULO DE USUÁRIOS
+
+- Vamos Começar criando nosso arquivo de migração
+  yarn typeorm migration:create -n CreateUsers
+
+- Depois de configurar a migração, vamos rodar o comando para criar a tabela no Banco de Dados
+  yarn typeorm migration:run
+
+- Agora vamos criar o módulo de Usuários:
+
+  - Primeiro vamos criar a pasta users, dentro de /src/modules.
+  - Depois vamos criar a pasta typeorm dentro de modules.
+  - Depois vamos criar a pasta entities dentro de typeorm.
+  - E por fim criar o arquivo de entidade chamado User.ts
+
+- Agora vamos criar o repositório dos Usuários:
+
+  - Primeiro vamos criar a pasta repositories, dentro de /src/modules/users/typeorm
+  - Agora vamos criar o arquivo chamado UsersRepository.ts
+  - Essa classe vem decorada por entity repository, quando criar @EntityRepository(User), veja que o parametro User é referente a entidade 'User.ts'.
+
+- Agora vamos Criar os Serviços de Usuários:
+
+  - Primeiro vamos criar a pasta services, dentro de /src/modules/users
+  - Agora vamos criar o primeiro serviço chamado CreateUserService.ts
+  - Agora vamos criar o serviço de Listagem chamado ListUserService.ts
+
+- Agora vamos criar o Controller de Usuários:
+
+  - Primeiro vamos criar a pasta controllers, dentro de /src/modules/users/
+  - Agora vamos criar o arquivo chamado UsersController.ts
+
+- Agora vamos criar as rotas de Usuários:
+
+  - Primeiro vamos criar a pasta chamada routes dentro de /src/modules/users
+  - Agora vamos criar o arquivo de rotas chamado users.routes.ts
+  - Primeira coisa a se fazer é importar o { Routes } do express
+    import { Router } from 'express
+  - Depois importar o celebrate, o Joi e o Segments para validação
+    import { celebrate, Joi, Segments } from 'celebrate'
+  - Depois importar o controller de Usuários
+    import UsersController from '../controllers/UsersController'
+  - Depois serão criadas 2 constantes, uma para Router que é quem vai criar a rota e outra pra uma nova instancia de UserController que é quem tem as regas de para listar ou inserir no banco de dados:
+    const userRouter = Router()
+    const userController = new UserController()
+  - Só a rota do post terá o celebrate, pois é o único que precisa fazer as validações para inserir no banco de dados, nesse caso de Usuários.
+
+- Criptografar o Password(Senha)
+
+  - Primeiro vamos instalar a biblioteca bcrypt
+    yarn add bcryptjs
+  - Também tem que instalar a tipagem de bcrypt
+    yarn add -D @types/bcryptjs
+  - Agora vamos configurar o arquivo CreateUserService.ts, será necessário criar uma constante que receberá o hash do bcryptjs, ele servirá para pegar a senha informada pelo usuário e criptografar
+    const hashedPassword = await hash(password, 8) -> o parametro password é a senha informada pelo usuário e o 8 é a quantidade de saltos
+  - Dentro do metodo usersRepository.create, o password ficará da seguinte forma
+    password: hashedPassword
+
+- Serviço de Autenticação:
+
+  - Para criar um serviço de autenticação em uma API, recomenda-se utilizar o metodo POST, pois efetivamente, esse processo está criando uma nova sessão, onde o usuário envia email e senha, e aí é verificado esses dados, apesar de não guardar estado no servidor,
+  - E para garantir que um usuário não vá acessar rotas sem estar autenticado, vamos utilizar a biblioteca JSONWebToken, aí protegemos essas rotas utilizando um Web Token. Também vamos criar um serviço chamado CreateSessionsService.ts, na pasta /src/modules/users/services
+
+- Sessions Controller:
+
+  - Primeiro deve criar o arquivo de controller chamado SessionsController.ts em /src/modules/users/controller.
+
+- Sessions Routes:
+
+  - Primeiro deve criar o arquivo de rota chamado sessions.routes.ts /src/modules/users/routes
+
+- Autenticação com Token JWT- JSON Web Token
+
+  - Implementar o Token:
+
+    - Primeiro Vamos instalar a biblioteca Json Web Token:
+      yarn add jsonwebtoken
+
+    - Depois vamos instalar os tipos dessa biblioteca:
+      yarn add -D @types/jsonwebtoken
+
+    - Agora precisamos abrir o arquivo de serviços CreateSessionsService.ts, dentro de /src/modules/users/services
+
+    - Vamos importar a biblioteca sign de jsonwebtoken
+      import { sign } from 'jsonwebtoken'
+
+    - Criação do Token:
+
+      - Vamos utilizar o metodo "sign", que é como se fosse uma assinatura, esse metodo recebe 3 parametros:
+
+        - O primeiro parametro é o payload, que a gente deseja configurar, são as informações que a gente quer devolver para o usuário, pra facilitar o uso la no frontend, é importante que não coloque informações sensiveis nesse payload,pq esse payload pode ser lido por qualquer pessoa a qualquer momento,basta interceptar esse token, que vc consegue ler o que tem dentro desse payload. Uma boa opção é colocar o id de um usuário nesse payload
+
+        - O segundo parametro é o hash, a gente diz qual vai ser o secret que será usado para criar esse token, é recomendado que acesse o site www.md5.cz e digita alguma coisa para ser criptografada, aí pega a hash gerada pelo site e copia no segundo parametro.
+
+        - O terceiro parametro é um objeto com configurações exigidas pelo token, tem que passar o objeto "subject" que é a informação usada pelo token, no exemplo abaixo vou usar o id do usuário(user) e o outro objeto a ser passado é o expireIn, que informa quanto tempo vai durar a sessão
+          const token = sign({}, 'd09d31171099344dbf53306a7873e910', {
+          subject: user.id,
+          expiresIn: '1d'
+          })
+
+        - No final não vai só retornar o user, vai ter que retornar também o token
+          return {
+          user,
+          token
+          };
+
+        - E será necessário criar uma interface chamada IResponse, contendo o retorno, no caso user e token.
+          interface IResponse {
+          user: User;
+          token: string
+          };
+
+        - No parametro do Promise, terá que ser trocado de Promise<User>, para Promise<IResponse>.
+
+- Middleware de Autenticação:
+
+  - Primeiro criar um arquivo chamado auth.ts, na pasta /src/config, nesse arquivo terá as seguintes informações:
+    export default{
+    jwt: {
+    secret: 'd09d31171099344dbf53306a7873e910',
+    expiresIn: '1d'
+    }
+    }
+
+  - Depois vamos no arquivo CreateSessionsService.ts e alteramos os seguintes objetos, na constante token, ele está assim:
+    const token = sign({}, 'd09d31171099344dbf53306a7873e910', {
+    subject: user.id,
+    expiresIn: '1d'
+    })
+
+    E ficará assim:
+    const token = sign({}, authConfig.jwt.secret, {
+    subject: user.id,
+    expiresIn: authConfig.jwt.expiresIn
+    })
+
+  - Agora vamos criar uma pasta chamada middlewares que ficará em:
+    /src/modules/users
+
+  - Vamos criar um middleware especifico de autenticação, chamado isAuthenticated.ts ,esse arquivo será criado em:
+    /src/modules/users/middlewares
+
+- Sobrescrita do Objeto Request:
+
+  - Adicionar informações do Usuário Autenticado no objeto Request através de um override, é simplesmente incluir o id do usuário autenticado através do token pra que seja usado nas demais rotas que estão configuradas nesse middleware, então através desse middleware de autenticação, vamos configura-las nas rotas que são protegidas e essas rotas vão poder fazer uso desse id do usuário que vamos está incluindo dentro do objeto do IRequire.
+
+  - Para o projeto ficar mais organizado, como o middleware será usado de modo geral, uma pasta chamada middlewares foi criada em /src/shared/http, o arquivo isAuthenticate.ts foi movido para essa pasta.
+
+  - No arquivo isAuthenticate.ts, temos que criar uma constante desestruturando o
+    request.headers.authorization, pq ele é um array com 2 posições e só precisamos da segunda posição do array, fazemos isso da seguinte forma:
+
+    - const [, token] = authHeader.split(' ')
+    - Veja que nesse exemplo, não colocamos nenhuma variavel na primeira posição, pois só precisaremos da segunda posição, poderia informar uma variavel mas não iriamos usar
+
+  - Depois criamos uma estrutura de excessão -> try catch, onde vamos criar mais uma constante chamada decodedToken que vai receber uma função do Json Web Token que recebe 2 parametros:
+
+    - O primeiro parametro é a constante token que recebemos o valor depois de desestruturar o headers.
+    - O segunda parametro é o secret, que está dentro do arquivo auth.ts, então a estrutura fica da seguinte maneira.
+    - Depois vamos verificar as informações da constante decodedToken, pois ela tem um objeto que vamos precisar, chamado "sub", então vamos utilizar o console.log para adiquirir essa informação.
+    - Podemos observar que a constante decodedToken só pode trazer 2 tipos de dados, ou string ou objeto, observamos que as 3 informações que ele trás, 2 estão em formato de number e 1 de string, mas as 3 estão como objeto, então temos que criar uma interface para definir seus tipos de dados, a interface será chamada de TokenPayload.
+      interface TokenPayload {
+      iat: number;
+      exp: number;
+      sub: string
+      }
+    - Vamos apagar o console.log, porque não vamos precisar mais.
+    - Agora a gente sabe que o sub tem o id do usuário
+    - Agora temos que colocar o objto dentro do Request
+    - Quando formos informar que o id é sub dentro do request.user, vai apresentar erro, pois user não é um tipo de request, então será necessário fazer um metodo avançado, chamado override, que no caso vamos criar uma pasta chamada types em /src, nessa pasta @types vamos estar definindo outros tipos para outras bibliotecas da nossa aplicação, nesse caso ele não vai substituir, vai agregar.
+    - Dentro da pasta @types, vamos criar uma pasta com o nome da biblioteca que vc quer sobrescrever, nesse caso vai ser o express, porque sabemos que o request é um objeto da biblioteca express.
+    - Vamos criar um arquivo chamado index.d.ts, que será o tipo que a gente quer acrescentar ao express.
+    - Para gente ter certeza que esse id do usuario está disponivel na request, tem que ir no arquivo users.routes.ts e verificar se o middleware está na rota get, depois ir no arquivo UsersController.ts e adicionar o console.log embaixo do const listUser = new ListUserService().
+      console.log(request.user.id)
+      try {
+      const decodedToken = verify(token, authConfig.jwt.secret)
+      const { sub } = decodedToken as TokenPayload
+      request.user = {
+      id = sub
+      }
+      }catch {
+      }
+
+  - Criar o arquivo chamado upload.ts, em /src/config
+
+  - Criar a pasta uploads na raiz, para receber os arquivos de imagem do avatar
+
+  - No arquivo index.d.ts, em /src/@types/express, adicionar o seguinte parametro:
+    file: {
+    filename: string
+    }
+
+  - Criar o arquivo de serviço para atualização do avatar de usuários chamado UpdateUseravatarService.ts
+
+  - Criar o arquivo de controller do avatar de usuários, chamado UserAvatarControllers.ts:
+
+  - Criar a rota de upload do avatar de usuários no arquivo users.routes.ts
+
+  - No arquivo server.ts, adicionar a seguinte rota:
+    app.use('/files', express.static(uploadConfig.directory))
+
+---
+
+- Gerenciamento de Senhas
+
+  - Nessa seção iremos implementar recursos para gerenciamento de senhas, dando ao usuário a opção de recuperar sua senha através do email cadastrado e, com isso, redefinir a nova senha.
+
+  - Migração da Tabela UserToken:
+
+    - Primeiro vamos criar o arquivo de migração:
+      yarn typeorm migration:create -n CreateUserTokens
+
+    - Nesse arquivo de migração, aprendemos como informar a foreign key e é utilizando as seguintes configurações:
+      foreignKeys: [
+      {
+      name: 'TokenUser',
+      referencedTableName: 'users',
+      referencedColumnNames: ['id'],
+      columnNames: ['user_id'],
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE'
+      }
+      ]
+
+    - Agora vamos rodar o comando para criar a tabelas user_tokens
+      yarn typeorm migration:run
+
+  - Entidade da tabela UserToken:
+
+    - Primeiro vamos criar o arquivo de entidade chamado UserToken.ts, em /src/modules/users/typeorm/entites.
+
+    - Uma novidade nesse arquivo é que a coluna token, vai ser do tupo uuid mas não vai ser uma chave primaria então, será necessário informar o parametro @Generated('uuid'), para informar que ela vai ser gerada pela biblioteca uuid, perceba que na coluna user_id, ela é uma chave estrangeira, então não precisa desse parametro, pois a informação vem de outra tabela.
+
+  - Repositório da tabela UserToken:
+
+    - Vamos criar o arquivo de repositório, chamado UserTokensRepository.ts, em /src/modules/users/typeorm/repositories.
+
+  - Serviços da Tabela UserToken:
+
+    - Vamos criar o primeiro arquivo de serviços, chamado SendForgotPasswordEmailService.ts, em /src/modules/users/services.
+
+    - Será criado um novo serviço chamado ResetPasswordService.ts, em /src/modules/users/services.
+
+    - Agora vamos fazer a instalação da biblioteca chamada date-fns, para tratar informações de Data.
+      yarn add date-fns
+
+    - Como instalamos a biblioteca date-fns, temos que importa-la para podermos usar os seus recursos.
+      import { isAfter, addHours } from 'date-fns'
+
+- Controller ForgotPassword:
+
+  - Primeiro vamos criar um arquivo de controller chamado ForgotPasswordController.ts, em /src/modules/users/controllers.
+
+- Route Password:
+
+  - Para não precisar criar 2 arquivos de rotas, referentes aos serviços: ResetPasswordService.ts e SendForgotPaswordEmailService.ts. Será criado um chamado password.routes.ts e nele vai conter as configurações referentes aos 2 serviços.
+
+- Controller ResetPassword:
+
+  - Agora vamos criar o arquivo de controller chamado ResetPasswordController
+
+- Route Reset Password:
+  -

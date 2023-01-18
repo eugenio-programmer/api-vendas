@@ -1,0 +1,19 @@
+Ol Dev!
+A configurao de campo para receber data com o tipo timestamp que ser exibida ao longo do curso, deve ser substituda para que no tenhamos
+problemas com fuso horário.
+Em todas as aulas em que houver criao de migration, considerar colocar os campos com o tipo timestamp com o valor timestamp with time zone.
+Substituir por (em todas as migraes da aplicação):
+
+{
+  name: 'created_at',
+  type: 'timestamp with time zone',
+  default: 'now()',
+},
+{
+  name: 'updated_at',
+  type: 'timestamp with time zone',
+  default: 'now()',
+}
+
+Qualquer dvida que permanecer entrar em contato.
+Obrigado pela compreenso e bons estudos.Abraços!
