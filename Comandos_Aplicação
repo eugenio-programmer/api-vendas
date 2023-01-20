@@ -609,4 +609,36 @@ Precisa Criar as validações das rotas, como por enquanto só temos produtos, v
   - Agora vamos criar o arquivo de controller chamado ResetPasswordController
 
 - Route Reset Password:
-  -
+
+  - Agora vamos criar uma rota chamada /reset, no arquivo password.routes.ts
+
+    passwordRouter.post(
+    '/reset',
+    celebrate({
+    [Segments.BODY]: {
+    token: Joi.string().uuid().required(),
+    password: Joi.string().required(),
+    password_confirmation: Joi.string().required().valid(Joi.ref('password'))
+
+        }
+
+    }),
+    resetPasswordController.create
+    )
+
+- Ethereal Fake Email Service:
+
+  - Vamos precisar instalar o Nodemailer:
+    yarn add nodemailer
+
+  - Vamos precisar instalar também a definição de titulos do nodemailer, porque não vem junto com o nodemailer, e se chama @types/nodemailer:
+    yarn add -D @types/nodemailer
+
+  - Criação do arquivo de configuração do Ethereal chamado EtherealMail.ts, que fica em /src/config/mail
+
+  - Para testar se está funcionando vamos alterar o arquivo SendForgotPasswordEmailService.ts, importa o arquivo EtherealMail.ts, comenta o console.log(token), e adiciona no lugar do console.log(token), a seguinte instrução
+    await EtherealMail.sendMail({
+    to: email,
+    body: `Solicitação de redefiniçãode senha recebida:  ${token} `
+    }):
+    import EtherealMail from '@config/mail/EtherealMail'

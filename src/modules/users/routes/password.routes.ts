@@ -16,7 +16,7 @@ passwordRouter.post(
 
     }
   }),
-  resetPasswordController.create
+  forgotPasswordController.create
 )
 
 passwordRouter.post(
@@ -29,7 +29,7 @@ passwordRouter.post(
 
     }
   }),
-  forgotPasswordController.create
+  resetPasswordController.create
 )
 
 export default passwordRouter
