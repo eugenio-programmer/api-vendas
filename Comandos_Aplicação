@@ -651,6 +651,10 @@ Precisa Criar as validações das rotas, como por enquanto só temos produtos, v
   - Agora precisamos criar o email que será o template engine, ele será chamado de HandlebarsMailTemplate.ts, precisamos de um parser para o conteúdo do nosso email
 
 - Template Engine com Handlebars:
+
   - Vamos montar um arquivo HTML com extensão hbs, que é a extensão do handlebars.
   - Primeiro vamos criar uma pasta chamada views, dentro de /src/modules/users.
   - Agora vamos criar o arquivo chamado forgot_password.hbs
+
+- Template com Handlebars:
+  -
