@@ -657,4 +657,8 @@ Precisa Criar as validações das rotas, como por enquanto só temos produtos, v
   - Agora vamos criar o arquivo chamado forgot_password.hbs
 
 - Template com Handlebars:
-  -
+
+  - Primeiro vamos abrir o arquivo chamado HandlebarsMailTemplate.ts, em /src/config/mail
+
+- Show Profile Service?
+  - Vamos criar 2 serviços em Usuários, primeiro o usuário vai conseguir criar o ser perfil chamado ShowProfileService.ts e no segundo, ele vai poder atualizar as informações do seu perfil que será chamado de UpdateProfileService.ts,
