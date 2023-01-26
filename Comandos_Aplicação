@@ -664,4 +664,8 @@ Precisa Criar as validações das rotas, como por enquanto só temos produtos, v
 
   - Vamos criar 2 serviços em Usuários, primeiro o usuário vai conseguir criar o ser perfil chamado ShowProfileService.ts e no segundo, ele vai poder atualizar as informações do seu perfil que será chamado de UpdateProfileService.ts.
 
-- Agora será criado o controller de User Profile, chamado UserProfileController.ts
+- Profile Controller:
+
+  - Agora será criado o controller de User Profile, chamado ProfileController.ts
+
+- Rotas de User Profile:
